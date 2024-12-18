@@ -3,9 +3,14 @@ import BackgroundLines from "../../components/BackgroundLines";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 
 interface Location {
   name: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lon: number;
 }
 
 const PageFind = () => {
@@ -23,26 +28,26 @@ const PageFind = () => {
 
     const options = {
       method: "GET",
-      url: "https://api.openweathermap.org/data/2.5/weather",
+      url: "https://api.openweathermap.org/geo/1.0/direct",
       params: {
         q: valueInput,
         appid: import.meta.env.VITE_APP_ID,
-        
+        limit: 3,
         lang: "pt_br",
       },
-      
     };
-
 
     const search = async () => {
       try {
         const response = await axios.request(options);
         console.log(response.data);
-        const locations: Location[] = [
-          {
-            name: response.data.name,
-          },
-        ];
+        const locations: Location[] = response.data.map((city: Location) => ({
+          name: city.name,
+          country: city.country,
+          state: city.state,
+          lat: city.lat,
+          lon: city.lon,
+        }));
         setFind(locations);
       } catch (error) {
         console.error(error);
@@ -69,7 +74,8 @@ const PageFind = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center justify-center gap-1 mt-20">
+      <Header />
+      <div className="flex flex-col items-center justify-center gap-1 ">
         <div className="top-10 left-0 w-full h-auto pointer-events-none">
           <BackgroundLines />
         </div>
@@ -87,10 +93,9 @@ const PageFind = () => {
           onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()}
         >
           {loading && (
-           <div className=" animate-spin text-blue_base absolute mt-12 ml-64">
-
-             <FaSpinner/>
-           </div>
+            <div className=" animate-spin text-blue_base absolute mt-12 ml-64">
+              <FaSpinner />
+            </div>
           )}
 
           <input
@@ -106,13 +111,18 @@ const PageFind = () => {
         {find.length > 0 ? (
           <div className="mt-4">
             {find.map((locale, index) => (
-              <button
-                onClick={handleSubmit}
-                key={index}
-                className="p-3 bg-gray-800  w-72 h-12  hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
-              >
-                <div className="text-white ">{locale.name}</div>
-              </button>
+              <div className="flex flex-col ">
+                <button
+                  onClick={handleSubmit}
+                  key={index}
+                  className="p-3 bg-gray-800  w-72 h-12  hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
+                >
+                  <p className="flex items-center justify-center w-72 -mt-3 -ml-3 ">
+                    {locale.name}, {locale.state ? `${locale.state} ` : ""}
+                    {locale.country}
+                  </p>
+                </button>
+              </div>
             ))}
           </div>
         ) : (

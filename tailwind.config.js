@@ -7,6 +7,7 @@ export default {
         bg_principal: "#13131A",
         blue_base:"#8FB2F5",
         bg_input:"#1E1E29",
+       
       },
     },
   },

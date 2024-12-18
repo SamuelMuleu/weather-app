@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import cloud from "../../assets/Vector.png";
 
 interface City {
   name: string;
@@ -43,7 +44,14 @@ const WeatherStatus = () => {
     }
   }, [cityName]);
   return (
-    <div>
+    <div className="flex items-center flex-col  justify-center ">
+<div className="flex gap-2">
+  <img className=" bg-bg_input p-3  rounded-lg" src={cloud}alt="" />
+<form >
+  <input type="text" />
+</form>
+</div>
+
       {city.length > 0 ? (
         <div>
           {city.map((city, index) => (
