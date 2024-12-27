@@ -1,11 +1,12 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import {  useState } from "react";
 import BackgroundLines from "../../components/BackgroundLines";
-import axios from "axios";
+
 import { FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
+import Input from "../../components/Input";
 
-interface Location {
+export interface Location {
   name: string;
   country: string;
   state?: string;
@@ -15,62 +16,22 @@ interface Location {
 
 const PageFind = () => {
   const [find, setFind] = useState<Location[]>([]);
-  const [valueInput, setValueInput] = useState<string>("");
+
 
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!valueInput) {
-      setFind([]);
-      return;
-    }
 
-    const options = {
-      method: "GET",
-      url: "https://api.openweathermap.org/geo/1.0/direct",
-      params: {
-        q: valueInput,
-        appid: import.meta.env.VITE_APP_ID,
-        limit: 3,
-        lang: "pt_br",
-      },
-    };
-
-    const search = async () => {
-      try {
-        const response = await axios.request(options);
-        console.log(response.data);
-        const locations: Location[] = response.data.map((city: Location) => ({
-          name: city.name,
-          country: city.country,
-          state: city.state,
-          lat: city.lat,
-          lon: city.lon,
-        }));
-        setFind(locations);
-      } catch (error) {
-        console.error(error);
-        setFind([]);
-      }
-    };
-
-    search();
-  }, [valueInput]);
-
-  const handleSubmit = () => {
+  const handleSubmit = (city:string) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (valueInput && find.length > 0) {
-        navigate(`/weatherstatus?city=${encodeURIComponent(valueInput)}`);
+      if (city) {
+        navigate(`/weatherstatus?city=${encodeURIComponent(city)}`);
       }
     }, 2000);
   };
 
-  const handleValueInput = (input: string) => {
-    setValueInput(input);
-  };
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -98,22 +59,14 @@ const PageFind = () => {
             </div>
           )}
 
-          <input
-            type="text"
-            placeholder="Buscar Local"
-            value={valueInput}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleValueInput(e.target.value)
-            }
-            className="mt-9 bg-bg_input border-gray w-72 h-12 placeholder:p-5 border-2  focus:border-blue_base outline-none rounded-lg"
-          />
+          <Input ValueInput={setFind} />
         </form>
         {find.length > 0 ? (
           <div className="mt-4">
             {find.map((locale, index) => (
               <div className="flex flex-col ">
                 <button
-                  onClick={handleSubmit}
+                  onClick={()=>handleSubmit(locale.name)}
                   key={index}
                   className="p-3 bg-gray-800  w-72 h-12  hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
                 >
@@ -126,7 +79,7 @@ const PageFind = () => {
             ))}
           </div>
         ) : (
-          <p className="text-white opacity-60 mt-10">Nenhum local encontrado</p>
+          <p className="text-white opacity-60 mt-10"></p>
         )}
         <div className="mt-6 top-10 left-0 w-full h-auto pointer-events-none">
           <BackgroundLines />
