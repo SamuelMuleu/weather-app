@@ -4,11 +4,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import cloud from "../../assets/Vector.png";
 import data from "../../assets/imagens";
 import Input from "../../components/Input";
+
+import cloudsImg from "../../assets/DayCloudyWeatherFewcloudsMomentDay.png";
 import { Location } from "../Find/page";
 
 interface City {
   name: string;
   temp: number;
+  temp_min: number;
+  temp_max: number;
+  feelsLike: number;
   state: string;
   weather: string;
   timezone: number;
@@ -18,37 +23,44 @@ interface City {
 
 const WeatherStatus = () => {
   const [city, setCity] = useState<City[]>([]);
+
   const [error, setError] = useState<string>("");
-  const location = useLocation();
   const [find, setFind] = useState<Location[]>([]);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const cityName = new URLSearchParams(location.search).get("city");
 
   const { images, backgroundWeather } = data;
 
+  console.log(find);
   useEffect(() => {
     if (!cityName) return;
 
     const FetchWeather = async () => {
-      const options = {
-        method: "GET",
-        url: "https://api.openweathermap.org/data/2.5/weather",
-        params: {
-          q: cityName,
-          appid: "d078f896d3a85db50d3de2fb3705e6ad",
-          lang: "pt_br",
-        },
-      };
       try {
-        const response = await axios.request(options);
+        const response = await axios.get(
+          "https://api.openweathermap.org/data/2.5/weather",
+          {
+            params: {
+              q: cityName,
+              appid: "d078f896d3a85db50d3de2fb3705e6ad",
+              lang: "pt_br",
+            },
+          }
+        );
+        console.log(response.data.main);
 
         const cities: City[] = [
           {
             name: response.data.name,
             temp: Math.round(response.data.main.temp - 273.15),
+            temp_min: Math.round(response.data.main.temp_min - 273.15),
+            temp_max: Math.round(response.data.main.temp_max - 273.15),
+            feelsLike: Math.round(response.data.main.feels_like - 273.15),
             state: response.data.sys.country,
-            weather: response.data.weather[0].main,
+            weather: response.data.weather[0].description,
             timezone: response.data.timezone,
             timestamp: response.data.timestamp,
             dt: response.data.dt,
@@ -56,8 +68,8 @@ const WeatherStatus = () => {
         ];
 
         setCity(cities);
-        setError("");
-        setFind([]);
+
+        console.log(cities);
       } catch (error) {
         console.error(error);
         setError("Erro 404: Não foi possível encontrar a cidade!");
@@ -66,29 +78,8 @@ const WeatherStatus = () => {
     FetchWeather();
   }, [cityName]);
 
-  const calcularPeriodo = (timezone: number, timestamp: number) => {
-    // Ajuste para o horário local, considerando o fuso horário
-    const localTime = timestamp + timezone; // timestamp já está em UTC
-    const horas = new Date(localTime * 1000).getHours(); // Hora local
-
-    if (horas >= 6 && horas < 12) {
-      return "Manhã";
-    } else if (horas >= 12 && horas < 18) {
-      return "Tarde";
-    } else {
-      return "Noite";
-    }
-  };
-
-  console.log(calcularPeriodo);
-  const handleSubmit = (city: string) => {
-    setTimeout(() => {
-      if (city) {
-        navigate(`/weatherstatus?city=${encodeURIComponent(city)}`);
-      }
-    }, 500);
-  };
-  const handleSubmitButton = () => {
+  const handleSubmitButton = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     navigate("/");
   };
 
@@ -112,52 +103,52 @@ const WeatherStatus = () => {
 
     const date = localTime.toLocaleDateString("pt-BR", dateOptions);
     const time = localTime.toLocaleTimeString("pt-BR", timeOptions);
+    const periodsOfTheDay = () => {
+      if (time >= "6:00" && time < "12:") {
+        return "Manhã";
+      } else if (time >= "12:00" && time < "18:00") {
+        return "Tarde";
+      } else {
+        return "Noite";
+      }
+    };
+    console.log(periodsOfTheDay());
     return { date, time };
+  };
+
+  const weatherImages: Record<string, string> = {
+    sun: images.sun,
+    moonNight: images.moonNight,
+    cloudyDay: images.cloudyDay,
+    cloudyNigth: images.cloudyNight,
+    fewCloudNigth: images.fewCloudNight,
+    dayCloudy: images.dayCloudy,
+    cloudyRain: images.cloudyRain,
+    cloudyRainNight: images.cloudyRainNight,
+    cloudSnow: images.cloudSnow,
+    cloudSnowNight: images.cloudSnowNight,
+    cloudStorm: images.cloudStorm,
+    cloudStormNight: images.cloudStormNight,
   };
 
   return (
     <div className="flex items-center flex-col   justify-center ">
-      <div className="fle gap-1  max-w-[21.8rem]">
-        <form
-          className="flex  flex-row gap-1"
-          onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()}
+      <div className="flex gap-1  max-w-[21.8rem]">
+        <button
+          onClick={handleSubmitButton}
+          className="  flex items-center justify-center  mt-8 bg-bg_input p-2 rounded-lg"
         >
-          <button
-            onClick={handleSubmitButton}
-            className="  flex items-center justify-center  mt-8 bg-bg_input p-2 rounded-lg"
-          >
-            <img src={cloud} alt="" />
-          </button>
+          <img src={cloud} alt="" />
+        </button>
 
-          <Input ValueInput={setFind} />
-
-          {find.length > 0 ? (
-            <div className="mt-6 absolute">
-              {find.map((locale, index) => (
-                <div className="flex flex-col z-10 relative top-16 left-14">
-                  <button
-                    onClick={() => handleSubmit(locale.name)}
-                    key={index}
-                    className="p-3 bg-gray-800  w-72 h-12  hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
-                  >
-                    <p className="flex items-center justify-center w-72 -mt-3 -ml-3 ">
-                      {locale.name}, {locale.state ? `${locale.state}  ` : ""}
-                      {locale.country}
-                    </p>
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-white opacity-60 mt-10"></p>
-          )}
-        </form>
+        <Input ValueInput={setFind} />
       </div>
 
       {city.length > 0 ? (
         <div>
           {city.map((city, index) => {
             const { date, time } = formatDate(city.dt, city.timezone);
+            const weatherImage = weatherImages[city.weather] || cloudsImg;
             return (
               <div key={index} className="mt-4 w-[21.8rem] ">
                 <img
@@ -167,21 +158,40 @@ const WeatherStatus = () => {
                 <p className=" font-black text-xl relative bottom-80 left-5">
                   {city.name},{city.state}
                 </p>
-                <p>{city.temp}</p>
-                <p>{city.weather}</p>
-                <p className=" font-semibold text relative bottom-[22.5rem] left-5">
+                <p className=" font-black text-5xl relative bottom-40 left-5">
+                  {city.temp}ºc
+                </p>
+                <div className="flex gap-1">
+                  <p className=" font-black text-xl relative bottom-40 left-5">
+                    {city.temp_min}ºc
+                  </p>
+                  <p className="font-bold text-xl relative bottom-40 left-5">
+                    /
+                  </p>
+                  <p className=" font-bold text-xl relative bottom-40 left-5">
+                    {city.temp_max}ºc
+                  </p>
+                </div>
+                <p className=" font-semibold relative bottom-[10rem] left-5 ">
+                  {city.weather}
+                </p>
+                <p className=" font-semibold text relative bottom-[25rem] left-5">
                   {date}
                 </p>
-                <p className=" font-semibold text relative bottom-[27rem] left-72">
+                <p className=" font-semibold text relative bottom-[29.5rem] left-72">
                   {time}
                 </p>
-                <img src={images.fewCloudNigth} alt="" />
+                <img
+                  className="relative bottom-[24.5rem] left-40"
+                  src={weatherImage}
+                  alt=""
+                />
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="font-bold text-2xl flex items-center  min-h-screen mb-10">
+        <div className="font-bold text-2xl flex items-center  min-h-screen ">
           {error}
         </div>
       )}
