@@ -76,10 +76,10 @@ const Input = ({ ValueInput }: ComponentProps) => {
   };
 
   return (
-    <div>
+    <div className=" flex items-center justify-center ml-2 ">
       <div>
         {loading && (
-          <div className="animate-spin text-blue_base absolute mt-10 ml-64">
+          <div className="animate-spin text-blue_base absolute mt-12 ml-64">
             <FaSpinner />
           </div>
         )}

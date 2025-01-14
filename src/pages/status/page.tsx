@@ -5,24 +5,27 @@ import cloud from "../../assets/Vector.png";
 import data from "../../assets/imagens";
 import Input from "../../components/Input";
 
-import cloudsImg from "../../assets/DayCloudyWeatherFewcloudsMomentDay.png";
 import { Location } from "../Find/page";
+import WeatherCard from "../../components/WeatherCard";
+import TableStatus from "../../components/TableStatus";
 
-interface City {
+export interface City {
   name: string;
   temp: number;
   temp_min: number;
   temp_max: number;
   feelsLike: number;
   state: string;
+  dt: number;
+  id: number;
   weather: string;
   timezone: number;
   timestamp: number;
-  dt: number;
 }
 
 const WeatherStatus = () => {
   const [city, setCity] = useState<City[]>([]);
+
 
   const [error, setError] = useState<string>("");
   const [find, setFind] = useState<Location[]>([]);
@@ -39,6 +42,10 @@ const WeatherStatus = () => {
     if (!cityName) return;
 
     const FetchWeather = async () => {
+
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
+      console.log(formattedDate)
       try {
         const response = await axios.get(
           "https://api.openweathermap.org/data/2.5/weather",
@@ -47,11 +54,12 @@ const WeatherStatus = () => {
               q: cityName,
               appid: "d078f896d3a85db50d3de2fb3705e6ad",
               lang: "pt_br",
+              date:formattedDate
+     
             },
           }
         );
-        console.log(response.data.main);
-
+        console.log(response.data);
         const cities: City[] = [
           {
             name: response.data.name,
@@ -60,6 +68,7 @@ const WeatherStatus = () => {
             temp_max: Math.round(response.data.main.temp_max - 273.15),
             feelsLike: Math.round(response.data.main.feels_like - 273.15),
             state: response.data.sys.country,
+            id: response.data.id,
             weather: response.data.weather[0].description,
             timezone: response.data.timezone,
             timestamp: response.data.timestamp,
@@ -68,8 +77,6 @@ const WeatherStatus = () => {
         ];
 
         setCity(cities);
-
-        console.log(cities);
       } catch (error) {
         console.error(error);
         setError("Erro 404: Não foi possível encontrar a cidade!");
@@ -103,37 +110,86 @@ const WeatherStatus = () => {
 
     const date = localTime.toLocaleDateString("pt-BR", dateOptions);
     const time = localTime.toLocaleTimeString("pt-BR", timeOptions);
+
     const periodsOfTheDay = () => {
-      if (time >= "6:00" && time < "12:") {
+      const [hours] = time.split(":").map(Number);
+
+      if (hours >= 6 && hours < 12) {
         return "Manhã";
-      } else if (time >= "12:00" && time < "18:00") {
+      } else if (hours >= 12 && hours < 18) {
         return "Tarde";
       } else {
         return "Noite";
       }
     };
-    console.log(periodsOfTheDay());
-    return { date, time };
+
+    const periods = periodsOfTheDay();
+
+    return { date, time, periods };
   };
 
-  const weatherImages: Record<string, string> = {
-    sun: images.sun,
-    moonNight: images.moonNight,
-    cloudyDay: images.cloudyDay,
-    cloudyNigth: images.cloudyNight,
-    fewCloudNigth: images.fewCloudNight,
-    dayCloudy: images.dayCloudy,
-    cloudyRain: images.cloudyRain,
-    cloudyRainNight: images.cloudyRainNight,
-    cloudSnow: images.cloudSnow,
-    cloudSnowNight: images.cloudSnowNight,
-    cloudStorm: images.cloudStorm,
-    cloudStormNight: images.cloudStormNight,
+
+  const getBackgroundImage = (period: string, weather: string) => {
+    console.log(period, weather);
+    if (period === "Manhã" && weather.includes("nublado")) {
+      return backgroundWeather.watherClearMomentDay;
+    } else if (period === "Tarde" && weather.includes("nublado")) {
+      return backgroundWeather.weatherCloudyMomentNight;
+    } else if (period === "Tarde" && weather.includes("céu limpo")) {
+      return backgroundWeather.watherClearMomentDay;
+    } else if (period === "Tarde" && weather.includes("chuva moderada")) {
+      return backgroundWeather.weatherRainMomentDay;
+    } else if (period === "Manhã" && weather.includes("algumas nuvens")) {
+      return backgroundWeather.weatherCloudMomentDay;
+    } else if (period === "Noite" && weather.includes("nublado")) {
+      return backgroundWeather.weatherCloudyMomentNight;
+    } else if (period === "Noite" && weather.includes("nuvens dispersas")) {
+      return backgroundWeather.weatherCloudyMomentNight;
+    } else if (period === "Noite" && weather.includes("chuva forte")) {
+      return backgroundWeather.weatherRainMomentNight;
+    } else if (period === "Noite" && weather.includes("céu limpo")) {
+      return backgroundWeather.weatherFewCloudsMomentNight;
+    } else if (period === "Manhã") {
+      return backgroundWeather.weatherFewCloudsMomentDay;
+    } else if (period === "Tarde") {
+      return backgroundWeather.weatherFewCloudsMomentNight;
+    } else {
+      return backgroundWeather.watherClearMomentDay;
+    }
+  };
+
+  const getWeatherIcons = (period: string, weather: string) => {
+    console.log(period, weather);
+    if (period === "Manhã" && weather.includes("nublado")) {
+      return images.cloudyDay;
+    } else if (period === "Tarde" && weather.includes("nublado")) {
+      return images.cloudyDay;
+    } else if (period === "Tarde" && weather.includes("chuva moderada")) {
+      return images.cloudStorm;
+    } else if (period === "Tarde" && weather.includes("céu limpo")) {
+      return images.sun;
+    } else if (period === "Manhã" && weather.includes("algumas nuvens")) {
+      return images.cloudyDay;
+    } else if (period === "Noite" && weather.includes("nublado")) {
+      return images.cloudyNight;
+    } else if (period === "Noite" && weather.includes("nuvens dispersas")) {
+      return images.fewCloudNight;
+    } else if (period === "Noite" && weather.includes("chuva forte")) {
+      return images.cloudStorm;
+    } else if (period === "Noite" && weather.includes("céu limpo")) {
+      return images.moonNight;
+    } else if (period === "Manhã") {
+      return images.sun;
+    } else if (period === "Tarde") {
+      return images.fewCloudNight;
+    } else {
+      return images.sun;
+    }
   };
 
   return (
-    <div className="flex items-center flex-col   justify-center ">
-      <div className="flex gap-1  max-w-[21.8rem]">
+    <div className="flex items-center flex-col   justify-center">
+      <div className="flex gap-1  max-w-[21.8rem] ">
         <button
           onClick={handleSubmitButton}
           className="  flex items-center justify-center  mt-8 bg-bg_input p-2 rounded-lg"
@@ -146,49 +202,23 @@ const WeatherStatus = () => {
 
       {city.length > 0 ? (
         <div>
-          {city.map((city, index) => {
-            const { date, time } = formatDate(city.dt, city.timezone);
-            const weatherImage = weatherImages[city.weather] || cloudsImg;
+          {city.map((city) => {
+            const { date, time, periods } = formatDate(city.dt, city.timezone);
+            const backgroundImage = getBackgroundImage(periods, city.weather);
+            const iconImage = getWeatherIcons(periods, city.weather);
+
             return (
-              <div key={index} className="mt-4 w-[21.8rem] ">
-                <img
-                  src={backgroundWeather.weatherFewCloudsMomentNight}
-                  alt=""
-                />
-                <p className=" font-black text-xl relative bottom-80 left-5">
-                  {city.name},{city.state}
-                </p>
-                <p className=" font-black text-5xl relative bottom-40 left-5">
-                  {city.temp}ºc
-                </p>
-                <div className="flex gap-1">
-                  <p className=" font-black text-xl relative bottom-40 left-5">
-                    {city.temp_min}ºc
-                  </p>
-                  <p className="font-bold text-xl relative bottom-40 left-5">
-                    /
-                  </p>
-                  <p className=" font-bold text-xl relative bottom-40 left-5">
-                    {city.temp_max}ºc
-                  </p>
-                </div>
-                <p className=" font-semibold relative bottom-[10rem] left-5 ">
-                  {city.weather}
-                </p>
-                <p className=" font-semibold text relative bottom-[25rem] left-5">
-                  {date}
-                </p>
-                <p className=" font-semibold text relative bottom-[29.5rem] left-72">
-                  {time}
-                </p>
-                <img
-                  className="relative bottom-[24.5rem] left-40"
-                  src={weatherImage}
-                  alt=""
-                />
-              </div>
+              <WeatherCard
+                key={city.id}
+                city={city}
+                backgroundImage={backgroundImage}
+                iconImage={iconImage}
+                date={date}
+                time={time}
+              />
             );
           })}
+          <TableStatus city={city} />
         </div>
       ) : (
         <div className="font-bold text-2xl flex items-center  min-h-screen ">

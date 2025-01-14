@@ -39,7 +39,8 @@ const images = {
     cloudSnow:cloudSnow,
     cloudSnowNight:cloudSnowNight,
     cloudStorm :cloudStorm,
-    cloudStormNight:cloudStormNight
+    cloudStormNight:cloudStormNight,
+    
     
 };
 const backgroundWeather = {
