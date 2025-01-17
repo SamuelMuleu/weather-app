@@ -8,5 +8,9 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    
+  },
+  server: {
+    hmr: true, // Garante que o HMR está habilitado
   },
 });

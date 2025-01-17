@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import cloud from "../../assets/Vector.png";
 import data from "../../assets/imagens";
 import Input from "../../components/Input";
 
-import { Location } from "../Find/page";
+
 import WeatherCard from "../../components/WeatherCard";
 import TableStatus from "../../components/TableStatus";
 
@@ -19,6 +19,8 @@ export interface City {
   dt: number;
   id: number;
   weather: string;
+  lat: number;
+  lon: number;
   timezone: number;
   timestamp: number;
 }
@@ -26,26 +28,22 @@ export interface City {
 const WeatherStatus = () => {
   const [city, setCity] = useState<City[]>([]);
 
-
   const [error, setError] = useState<string>("");
-  const [find, setFind] = useState<Location[]>([]);
+
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const cityName = new URLSearchParams(location.search).get("city");
 
   const { images, backgroundWeather } = data;
 
-  console.log(find);
   useEffect(() => {
     if (!cityName) return;
 
     const FetchWeather = async () => {
-
       const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-      console.log(formattedDate)
+      const formattedDate = today.toISOString().split("T")[0];
+
       try {
         const response = await axios.get(
           "https://api.openweathermap.org/data/2.5/weather",
@@ -54,12 +52,12 @@ const WeatherStatus = () => {
               q: cityName,
               appid: "d078f896d3a85db50d3de2fb3705e6ad",
               lang: "pt_br",
-              date:formattedDate
-     
+              date: formattedDate,
             },
           }
         );
-        console.log(response.data);
+
+    
         const cities: City[] = [
           {
             name: response.data.name,
@@ -69,6 +67,8 @@ const WeatherStatus = () => {
             feelsLike: Math.round(response.data.main.feels_like - 273.15),
             state: response.data.sys.country,
             id: response.data.id,
+            lat: response.data.coord.lat,
+            lon: response.data.coord.lon,
             weather: response.data.weather[0].description,
             timezone: response.data.timezone,
             timestamp: response.data.timestamp,
@@ -83,7 +83,7 @@ const WeatherStatus = () => {
       }
     };
     FetchWeather();
-  }, [cityName]);
+  }, [ cityName]);
 
   const handleSubmitButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -128,9 +128,7 @@ const WeatherStatus = () => {
     return { date, time, periods };
   };
 
-
   const getBackgroundImage = (period: string, weather: string) => {
-    console.log(period, weather);
     if (period === "Manhã" && weather.includes("nublado")) {
       return backgroundWeather.watherClearMomentDay;
     } else if (period === "Tarde" && weather.includes("nublado")) {
@@ -159,7 +157,6 @@ const WeatherStatus = () => {
   };
 
   const getWeatherIcons = (period: string, weather: string) => {
-    console.log(period, weather);
     if (period === "Manhã" && weather.includes("nublado")) {
       return images.cloudyDay;
     } else if (period === "Tarde" && weather.includes("nublado")) {
@@ -197,7 +194,7 @@ const WeatherStatus = () => {
           <img src={cloud} alt="" />
         </button>
 
-        <Input ValueInput={setFind} />
+        <Input ValueInput={()=>{}} />
       </div>
 
       {city.length > 0 ? (
@@ -208,17 +205,19 @@ const WeatherStatus = () => {
             const iconImage = getWeatherIcons(periods, city.weather);
 
             return (
-              <WeatherCard
-                key={city.id}
-                city={city}
-                backgroundImage={backgroundImage}
-                iconImage={iconImage}
-                date={date}
-                time={time}
-              />
+              <div key={city.id}>
+                <WeatherCard
+                  key={city.id}
+                  city={city}
+                  backgroundImage={backgroundImage}
+                  iconImage={iconImage}
+                  date={date}
+                  time={time}
+                />
+                <TableStatus lat={city.lat} lon={city.lon} />
+              </div>
             );
           })}
-          <TableStatus city={city} />
         </div>
       ) : (
         <div className="font-bold text-2xl flex items-center  min-h-screen ">

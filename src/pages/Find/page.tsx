@@ -1,6 +1,4 @@
-
 import BackgroundLines from "../../components/BackgroundLines";
-
 
 import Header from "../../components/Header";
 import Input from "../../components/Input";
@@ -14,9 +12,6 @@ export interface Location {
 }
 
 const PageFind = () => {
-
-
-  
 
   return (
     <div className="flex flex-col items-center justify-center">
