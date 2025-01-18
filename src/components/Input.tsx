@@ -23,6 +23,7 @@ const Input = ({ ValueInput }: ComponentProps) => {
     }
 
     const search = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           "https://api.openweathermap.org/geo/1.0/direct",
@@ -48,6 +49,8 @@ const Input = ({ ValueInput }: ComponentProps) => {
         setFind(locations);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -68,9 +71,11 @@ const Input = ({ ValueInput }: ComponentProps) => {
     if (!city) return;
 
     setLoading(true);
-    setFind([]);
+
     setTimeout(() => {
       setLoading(false);
+      setFind([]);
+      setValueInput("")
       navigate(`/weatherstatus?city=${encodeURIComponent(city)}`);
     }, 1500);
   };
@@ -91,6 +96,7 @@ const Input = ({ ValueInput }: ComponentProps) => {
             placeholder="Buscar Local"
             value={valueInput}
             onChange={handleValueInput}
+            aria-label="Campo de busca de local"
             className="mt-9 bg-bg_input border-gray w-72 h-12 placeholder:p-5 border-2 focus:border-blue_base outline-none rounded-lg"
           />
 

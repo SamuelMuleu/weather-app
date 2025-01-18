@@ -5,9 +5,9 @@ import cloud from "../../assets/Vector.png";
 import data from "../../assets/imagens";
 import Input from "../../components/Input";
 
-
 import WeatherCard from "../../components/WeatherCard";
 import TableStatus from "../../components/TableStatus";
+import WeekWeather from "@/components/WeekWeather";
 
 export interface City {
   name: string;
@@ -29,7 +29,6 @@ const WeatherStatus = () => {
   const [city, setCity] = useState<City[]>([]);
 
   const [error, setError] = useState<string>("");
-
 
   const navigate = useNavigate();
 
@@ -53,18 +52,18 @@ const WeatherStatus = () => {
               appid: "d078f896d3a85db50d3de2fb3705e6ad",
               lang: "pt_br",
               date: formattedDate,
+              units: "metric",
             },
           }
         );
 
-    
         const cities: City[] = [
           {
             name: response.data.name,
-            temp: Math.round(response.data.main.temp - 273.15),
-            temp_min: Math.round(response.data.main.temp_min - 273.15),
-            temp_max: Math.round(response.data.main.temp_max - 273.15),
-            feelsLike: Math.round(response.data.main.feels_like - 273.15),
+            temp: response.data.main.temp.toFixed(0) ,
+            temp_min: response.data.main.temp_min.toFixed(0) ,
+            temp_max: response.data.main.temp_max.toFixed(0),
+            feelsLike: response.data.main.feels_like,
             state: response.data.sys.country,
             id: response.data.id,
             lat: response.data.coord.lat,
@@ -83,7 +82,7 @@ const WeatherStatus = () => {
       }
     };
     FetchWeather();
-  }, [ cityName]);
+  }, [cityName]);
 
   const handleSubmitButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -108,8 +107,10 @@ const WeatherStatus = () => {
       timeZone: "UTC",
     };
 
+
     const date = localTime.toLocaleDateString("pt-BR", dateOptions);
     const time = localTime.toLocaleTimeString("pt-BR", timeOptions);
+
 
     const periodsOfTheDay = () => {
       const [hours] = time.split(":").map(Number);
@@ -123,9 +124,8 @@ const WeatherStatus = () => {
       }
     };
 
-    const periods = periodsOfTheDay();
-
-    return { date, time, periods };
+    console.log(periodsOfTheDay());
+    return {date, time, periods: periodsOfTheDay() };
   };
 
   const getBackgroundImage = (period: string, weather: string) => {
@@ -146,6 +146,8 @@ const WeatherStatus = () => {
     } else if (period === "Noite" && weather.includes("chuva forte")) {
       return backgroundWeather.weatherRainMomentNight;
     } else if (period === "Noite" && weather.includes("céu limpo")) {
+      return backgroundWeather.weatherFewCloudsMomentNight;
+    } else if (period === "Noite" && weather.includes("algumas nuvens")) {
       return backgroundWeather.weatherFewCloudsMomentNight;
     } else if (period === "Manhã") {
       return backgroundWeather.weatherFewCloudsMomentDay;
@@ -175,6 +177,8 @@ const WeatherStatus = () => {
       return images.cloudStorm;
     } else if (period === "Noite" && weather.includes("céu limpo")) {
       return images.moonNight;
+    } else if (period === "Noite" && weather.includes("algumas nuvens")) {
+      return images.fewCloudNight;
     } else if (period === "Manhã") {
       return images.sun;
     } else if (period === "Tarde") {
@@ -194,7 +198,7 @@ const WeatherStatus = () => {
           <img src={cloud} alt="" />
         </button>
 
-        <Input ValueInput={()=>{}} />
+        <Input ValueInput={() => {}} />
       </div>
 
       {city.length > 0 ? (
@@ -215,6 +219,7 @@ const WeatherStatus = () => {
                   time={time}
                 />
                 <TableStatus lat={city.lat} lon={city.lon} />
+                <WeekWeather city={city} />
               </div>
             );
           })}

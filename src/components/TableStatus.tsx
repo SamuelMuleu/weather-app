@@ -12,13 +12,13 @@ import airHumidity from "@/assets/svg/dropLight.svg";
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-interface CityWeek {
+export interface CityWeek {
   temp: number;
 
   feelsLike: number;
   humidity: number;
   wind: number;
-  rain:number
+  rain: number;
 
   id: number;
   weather: string;
@@ -43,23 +43,25 @@ const TableStatus = ({ lat, lon }: TableStatusProps) => {
               appid: "d078f896d3a85db50d3de2fb3705e6ad",
               lang: "pt_br",
               cnt: 7,
+              units: "metric",
             },
           }
         );
-        console.log(response.data)
+        console.log(response.data);
         const cities: CityWeek[] = [
           {
-            temp: Math.round(response.data.list[0].main.temp - 273.15),
+            temp: response.data.list[0].main.temp.toFixed(0),
 
-            feelsLike: Math.round(
-              response.data.list[0].main.feels_like - 273.15
-            ),
+            feelsLike: 
+              response.data.list[0].main.feels_like.toFixed(0),
+            
             humidity: response.data.list[0].main.humidity,
-          rain:response.data.list[0].pop,
+            rain: response.data.list[0].pop * 100,
 
             id: response.data.city.id,
             weather: response.data.list[0].weather[0].description,
-            wind: response.data.list[0].wind.speed
+
+            wind: response.data.list[0].wind.speed,
           },
         ];
         setCity(cities);
@@ -68,14 +70,14 @@ const TableStatus = ({ lat, lon }: TableStatusProps) => {
       }
     };
     fetchCityWeek();
-  }, []);
+  }, [lat, lon]);
   return (
     <>
       {city.map((c) => (
-        <Table key={c.id}>
+        <Table key={c.id} className="bg-bg_table rounded-xl mb-4 ">
           <TableHeader>
             <TableRow>
-              <TableCell className="font-medium">
+              <TableCell className="font-medium ">
                 <img src={termometer} alt="Termômetro" />
               </TableCell>
               <TableCell>Sensação Térmica</TableCell>
