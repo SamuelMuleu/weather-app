@@ -12,37 +12,28 @@ export interface Location {
 }
 
 const PageFind = () => {
-
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className=" relative flex flex-col items-center justify-center">
       <Header />
-      <div className="flex flex-col items-center justify-center gap-1 ">
-        <div className="top-10 left-0 w-full h-auto pointer-events-none">
+      <div className="flex flex-col items-center justify-center  ">
+        <div className=" absolute top-10 left-0 w-full h-auto pointer-events-none">
           <BackgroundLines />
         </div>
-        <div className="bottom-72 left-0 w-full h-auto pointer-events-none">
+        <div className=" absolute bottom-80 left-0 w-full h-auto pointer-events-none">
           <BackgroundLines />
         </div>
 
-        <div className="text-2xl font-bold text-white">
+        <div className=" mt-44 text-2xl font-bold text-white">
           Bem Vindo ao <span className="text-blue_base">Weather</span>
         </div>
         <p className="text-1xl opacity-45">
           Escolha um local para ver a previsão do tempo
         </p>
-  
- 
-          <Input ValueInput={(data) => console.log(data)}/>
-   
-     
-  
-   
-        <div className="mt-6 top-10 left-0 w-full h-auto pointer-events-none">
-          <BackgroundLines />
-        </div>
-        <div className="bottom-72 left-0 w-full h-auto pointer-events-none">
-          <BackgroundLines />
-        </div>
+<div className="mt-10">
+
+        <Input ValueInput={(data) => console.log(data)} />
+</div>
+
       </div>
     </div>
   );

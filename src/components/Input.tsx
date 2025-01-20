@@ -81,7 +81,7 @@ const Input = ({ ValueInput }: ComponentProps) => {
   };
 
   return (
-    <div className=" flex items-center justify-center ml-2 ">
+    <div className=" flex items-center justify-center ml-2  ">
       <div>
         {loading && (
           <div className="animate-spin text-blue_base absolute mt-12 ml-64">
@@ -97,21 +97,21 @@ const Input = ({ ValueInput }: ComponentProps) => {
             value={valueInput}
             onChange={handleValueInput}
             aria-label="Campo de busca de local"
-            className="mt-9 bg-bg_input border-gray w-72 h-12 placeholder:p-5 border-2 focus:border-blue_base outline-none rounded-lg"
+            className="mt-9 bg-bg_input border-gray w-72  lg:w-[35rem] h-12 placeholder:p-5 border-2 focus:border-blue_base outline-none rounded-lg"
           />
 
           {find.length > 0 ? (
-            <div className="mt-6 absolute">
+            <div className="mt-6 absolute ">
               {find.map((locale, index) => (
                 <div
                   key={index}
-                  className="flex flex-col z-10 relative bottom-4 left-0"
+                  className="flex flex-col z-10 relative bottom-4  left-0"
                 >
                   <button
                     onClick={(e) => handleSubmit(locale.name, e)}
-                    className="p-3 bg-gray-800 w-72 h-12 hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
+                    className="p-3 bg-gray-800 w-72 lg:w-[35rem] h-12 hover:bg-gray-700  hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
                   >
-                    <p className="flex items-center justify-center w-72 -mt-3 -ml-3">
+                    <p className="flex items-center justify-center w-72 lg:w-[35rem] -mt-3 -ml-3">
                       {locale.name}, {locale.state ? `${locale.state} ` : ""}
                       {locale.country}
                     </p>

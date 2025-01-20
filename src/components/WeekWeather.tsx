@@ -67,37 +67,39 @@ const WeekWeather = ({ city }: WeekDays) => {
   }, [city.lat, city.lon]);
 
   return (
-    <div className="bg-bg_table rounded-xl mb-4 font-semibold">
-      {weekData.map((day, index) => {
-        const { temp_max, temp_min, weather } = day;
+    <div className="bg-bg_table rounded-xl mb-4 w-[22rem] mx-5 font-semibold p-2 px-2">
+      <div className="flex flex-row justify-between gap-x-4">
+        {weekData.map((day, index) => {
+          const { temp_max, temp_min, weather } = day;
 
-        const formattedDate = new Date(
-          new Date().setDate(new Date().getDate() + index)
-        )
-          .toLocaleDateString("pt-BR", {
-            weekday: "short",
-          })
-          .replace(".", "");
+          const formattedDate = new Date(
+            new Date().setDate(new Date().getDate() + index)
+          )
+            .toLocaleDateString("pt-BR", {
+              weekday: "short",
+            })
+            .replace(".", "");
 
-        // Obtendo o ícone de clima
-        const weatherIcon = getCustomWeatherIcon(weather);
+          const weatherIcon = getCustomWeatherIcon(weather);
 
-        return (
-
-          <div key={index} className="flex   items-center justify-between mb-3">
-    
-            <div className="flex-1">{formattedDate}</div>
-            <div className="flex-1">
-              {weatherIcon && (
-                <img src={weatherIcon} alt={weather} className="w-8 h-8" />
-              )}
+          return (
+            <div key={index} className="flex flex-col items-center">
+              <div className="text-center">{formattedDate}</div>
+              <div>
+                {weatherIcon && (
+                  <img src={weatherIcon} alt={weather} className="w-8 h-8" />
+                )}
+              </div>
+              <div className="text-center">
+                {temp_max}ºC
+                 <span className="flex opacity-55">
+                 {temp_min}ºC
+                  </span> 
+              </div>
             </div>
-            <div className="flex-1">
-              {temp_max}ºC / {temp_min}ºC
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

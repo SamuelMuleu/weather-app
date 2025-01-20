@@ -60,8 +60,8 @@ const WeatherStatus = () => {
         const cities: City[] = [
           {
             name: response.data.name,
-            temp: response.data.main.temp.toFixed(0) ,
-            temp_min: response.data.main.temp_min.toFixed(0) ,
+            temp: response.data.main.temp.toFixed(0),
+            temp_min: response.data.main.temp_min.toFixed(0),
             temp_max: response.data.main.temp_max.toFixed(0),
             feelsLike: response.data.main.feels_like,
             state: response.data.sys.country,
@@ -107,10 +107,8 @@ const WeatherStatus = () => {
       timeZone: "UTC",
     };
 
-
     const date = localTime.toLocaleDateString("pt-BR", dateOptions);
     const time = localTime.toLocaleTimeString("pt-BR", timeOptions);
-
 
     const periodsOfTheDay = () => {
       const [hours] = time.split(":").map(Number);
@@ -125,7 +123,7 @@ const WeatherStatus = () => {
     };
 
     console.log(periodsOfTheDay());
-    return {date, time, periods: periodsOfTheDay() };
+    return { date, time, periods: periodsOfTheDay() };
   };
 
   const getBackgroundImage = (period: string, weather: string) => {
@@ -189,46 +187,60 @@ const WeatherStatus = () => {
   };
 
   return (
-    <div className="flex items-center flex-col   justify-center">
-      <div className="flex gap-1  max-w-[21.8rem] ">
-        <button
-          onClick={handleSubmitButton}
-          className="  flex items-center justify-center  mt-8 bg-bg_input p-2 rounded-lg"
-        >
-          <img src={cloud} alt="" />
-        </button>
+    <div className="flex flex-col lg:flex-row lg:justify-center ">
+      <div className="flex flex-col items-center lg:w-1/2">
+        <div className="flex gap-1">
+          <button
+            onClick={handleSubmitButton}
+            className="flex items-center  justify-center mt-8 bg-bg_input p-2 rounded-lg"
+          >
+            <img src={cloud} alt="" />
+          </button>
+          <Input ValueInput={() => {}} />
+        </div>
 
-        <Input ValueInput={() => {}} />
+        {city.length > 0 ? (
+          <div>
+            {city.map((city) => {
+              const { date, time, periods } = formatDate(
+                city.dt,
+                city.timezone
+              );
+              const backgroundImage = getBackgroundImage(periods, city.weather);
+              const iconImage = getWeatherIcons(periods, city.weather);
+
+              return (
+                <div key={city.id}>
+                  <WeatherCard
+                    city={city}
+                    backgroundImage={backgroundImage}
+                    iconImage={iconImage}
+                    date={date}
+                    time={time}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="font-bold text-2xl flex items-center min-h-screen">
+            {error}
+          </div>
+        )}
       </div>
 
-      {city.length > 0 ? (
-        <div>
-          {city.map((city) => {
-            const { date, time, periods } = formatDate(city.dt, city.timezone);
-            const backgroundImage = getBackgroundImage(periods, city.weather);
-            const iconImage = getWeatherIcons(periods, city.weather);
-
-            return (
+      <div className="flex flex-col items-center lg:w-1/2">
+        {city.length > 0 && (
+          <div>
+            {city.map((city) => (
               <div key={city.id}>
-                <WeatherCard
-                  key={city.id}
-                  city={city}
-                  backgroundImage={backgroundImage}
-                  iconImage={iconImage}
-                  date={date}
-                  time={time}
-                />
                 <TableStatus lat={city.lat} lon={city.lon} />
                 <WeekWeather city={city} />
               </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="font-bold text-2xl flex items-center  min-h-screen ">
-          {error}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

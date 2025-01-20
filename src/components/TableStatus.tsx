@@ -52,9 +52,8 @@ const TableStatus = ({ lat, lon }: TableStatusProps) => {
           {
             temp: response.data.list[0].main.temp.toFixed(0),
 
-            feelsLike: 
-              response.data.list[0].main.feels_like.toFixed(0),
-            
+            feelsLike: response.data.list[0].main.feels_like.toFixed(0),
+
             humidity: response.data.list[0].main.humidity,
             rain: response.data.list[0].pop * 100,
 
@@ -74,37 +73,63 @@ const TableStatus = ({ lat, lon }: TableStatusProps) => {
   return (
     <>
       {city.map((c) => (
-        <Table key={c.id} className="bg-bg_table rounded-xl mb-4 ">
+        <Table
+          key={c.id}
+          className="bg-bg_table flex w-[22rem] lg:w-[39rem] lg:h-[20rem] lg:mt-6  mx-5 flex-col items-center justify-center rounded-xl mb-4 "
+        >
+          <span className="hidden lg:block lg:opacity-55 lg:mr-[22rem]">
+            Detalhes do clima hoje
+          </span>
           <TableHeader>
             <TableRow>
-              <TableCell className="font-medium ">
-                <img src={termometer} alt="Termômetro" />
-              </TableCell>
-              <TableCell>Sensação Térmica</TableCell>
-              <TableCell>{c.feelsLike}ºc</TableCell>
+              <div className="lg:w-[30rem]">
+                <TableCell>
+                  <img
+                    src={termometer}
+                    alt="Termômetro"
+                    className="opacity-55"
+                  />
+                </TableCell>
+                <TableCell>Sensação Térmica</TableCell>
+              </div>
+              <TableCell className="font-black">{c.feelsLike}ºc</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-medium">
-                <img src={cloudRain} alt="Chuva" />
-              </TableCell>
-              <TableCell>Probabilidade de Chuva</TableCell>
-              <TableCell>{c.rain}%</TableCell>
+              <div className="lg:w-[30rem]">
+                <TableCell>
+                  <img src={cloudRain} alt="Chuva " className="opacity-55" />
+                </TableCell>
+                <TableCell>Probabilidade de Chuva</TableCell>
+              </div>
+              <TableCell className="font-black text-end">{c.rain}%</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-medium">
-                <img src={wind} alt="Termômetro" />
+              <div className="lg:w-[28rem]">
+                <TableCell>
+                  <img src={wind} alt="Termômetro" className="opacity-55" />
+                </TableCell>
+                <TableCell>Velocidade do vento</TableCell>
+              </div>
+              <TableCell className="font-black">
+                {c.wind.toFixed(1)} km/h
               </TableCell>
-              <TableCell>Velocidade do vento</TableCell>
-              <TableCell>{c.wind.toFixed(1)} km/h</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-medium">
-                <img src={airHumidity} alt="Termômetro" />
+              <div className="lg:w-[29rem]">
+                <TableCell>
+                  <img
+                    src={airHumidity}
+                    alt="Termômetro"
+                    className="opacity-55  "
+                  />
+                </TableCell>
+                <TableCell>Humidade do ar </TableCell>
+              </div>
+              <TableCell className="font-black text-end">
+                {c.humidity}%
               </TableCell>
-              <TableCell>Humidade do ar </TableCell>
-              <TableCell>{c.humidity}%</TableCell>
             </TableRow>
           </TableBody>
         </Table>
