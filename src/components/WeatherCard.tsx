@@ -16,6 +16,7 @@ const WeatherCard = ({
 }: WeatherCardProps) => {
   const cities = useSelector((state: RootState) => state.cities.cities);
 
+
   const { name, state, temp, temp_max, temp_min, weather } = cities[0];
 
   return (
