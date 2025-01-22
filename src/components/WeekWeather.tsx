@@ -1,11 +1,9 @@
-import { City } from "@/pages/status/page";
 import data from "@/assets/imagens";
+
+import { RootState } from "@/store";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-interface WeekDays {
-  city: City;
-}
+import { useSelector } from "react-redux";
 
 interface WeatherData {
   main: {
@@ -15,86 +13,93 @@ interface WeatherData {
   weather: { description: string }[];
 }
 
-const WeekWeather = ({ city }: WeekDays) => {
+const WeekWeather = () => {
   const [weekData, setWeekData] = useState<[]>([]);
   const { images } = data;
 
+  const { cities } = useSelector((state: RootState) => state.cities);
+
   const getCustomWeatherIcon = (weather: string) => {
-    if (weather.includes("nublado")) {
-      return images.cloudyDay;
-    } else if (weather.includes("céu limpo")) {
-      return images.sun;
-    } else if (weather.includes("chuva")) {
-      return images.sun;
-    } else if (weather.includes("tempestade")) {
-      return images.sun;
-    } else {
-      return images.sun;
-    }
+    if (weather.includes("nublado")) return images.cloudyDay;
+    if (weather.includes("nuvens dispersas")) return images.dayCloudy;
+    if (weather.includes("céu limpo")) return images.sun;
+    if (weather.includes("chuva")) return images.cloudyRain;
+    if (weather.includes("tempestade")) return images.cloudStorm;
+    if (weather.includes("algumas nuvens")) return images.cloudyDay;
+    return images.sun;
   };
 
   useEffect(() => {
-    const fetchCityWeek = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.openweathermap.org/data/2.5/forecast",
-          {
-            params: {
-              lat: city.lat,
-              lon: city.lon,
-              appid: "d078f896d3a85db50d3de2fb3705e6ad",
-              lang: "pt_br",
-              cnt: 7,
-              units: "metric",
-            },
-          }
-        );
+    if (cities.length > 0) {
+      const { lat, lon } = cities[0];
+      const fetchCityWeek = async () => {
+        try {
+          const response = await axios.get(
+            "https://api.openweathermap.org/data/2.5/forecast",
+            {
+              params: {
+                lat: lat,
+                lon: lon,
+                appid: import.meta.env.VITE_APP_ID,
+                lang: "pt_br",
+                cnt: 7,
+                units: "metric",
+              },
+            }
+          );
 
-        const cities = response.data.list
-          .slice(0, 5)
-          .map((item: WeatherData) => ({
-            temp_max: item.main.temp_max.toFixed(0),
-            temp_min: item.main.temp_min.toFixed(0),
-            weather: item.weather[0].description,
-          }));
+          const cities = response.data.list
+            .slice(1, 6)
+            .map((item: WeatherData) => ({
+              temp_max: item.main.temp_max.toFixed(0),
+              temp_min: item.main.temp_min.toFixed(0),
+              weather: item.weather[0].description,
+            }));
 
-        setWeekData(cities);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchCityWeek();
-  }, [city.lat, city.lon]);
+          setWeekData(cities);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchCityWeek();
+    }
+  }, [cities]);
 
   return (
-    <div className="bg-bg_table rounded-xl mb-4 w-[22rem] mx-5 font-semibold p-2 px-2">
-      <div className="flex flex-row justify-between gap-x-4">
+    <div className="bg-bg_table rounded-xl mb-4 w-[22rem] lg:p-8 lg:w-[39rem] mx-5 font-semibold p-2 px-2  flex  flex-col gap-3">
+      <span className="hidden lg:inline lg:opacity-55 ">
+        Previsão para 5 Dias
+      </span>
+      <div className="flex flex-row justify-between ">
         {weekData.map((day, index) => {
           const { temp_max, temp_min, weather } = day;
 
-          const formattedDate = new Date(
-            new Date().setDate(new Date().getDate() + index)
-          )
-            .toLocaleDateString("pt-BR", {
-              weekday: "short",
-            })
+          const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+            weekday: "short",
+          })
+            .format(
+              new Date(new Date().setDate(new Date().getDate() + index + 1))
+            )
             .replace(".", "");
-
           const weatherIcon = getCustomWeatherIcon(weather);
 
           return (
-            <div key={index} className="flex flex-col items-center">
+            <div
+              key={index}
+              className="flex flex-col justify-center items-center"
+            >
               <div className="text-center">{formattedDate}</div>
               <div>
                 {weatherIcon && (
                   <img src={weatherIcon} alt={weather} className="w-8 h-8" />
                 )}
               </div>
-              <div className="text-center">
+              <div className="hidden lg:flex lg:text-sm justify-center my-1 opacity-55">
+                {weather}
+              </div>
+              <div className="lg:flex gap-2">
                 {temp_max}ºC
-                 <span className="flex opacity-55">
-                 {temp_min}ºC
-                  </span> 
+                <span className="flex fle opacity-55">{temp_min}ºC</span>
               </div>
             </div>
           );

@@ -3,21 +3,21 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Location } from "../pages/Find/page";
 import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
+import { motion } from "framer-motion";
 
-interface ComponentProps {
-  ValueInput: (results: Location[]) => void;
-}
 
-const Input = ({ ValueInput }: ComponentProps) => {
+const Input = () => {
   const [valueInput, setValueInput] = useState<string>("");
   const [find, setFind] = useState<Location[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!valueInput) {
-      ValueInput([]);
+    if (valueInput === "") {
+      setValueInput('');
+    
       setFind([]);
       return;
     }
@@ -36,6 +36,7 @@ const Input = ({ ValueInput }: ComponentProps) => {
             },
           }
         );
+        
 
         const locations: Location[] = response.data.map((city: Location) => ({
           name: city.name,
@@ -45,8 +46,9 @@ const Input = ({ ValueInput }: ComponentProps) => {
           lon: city.lon,
         }));
 
-        ValueInput(locations);
+     
         setFind(locations);
+  
       } catch (error) {
         console.error(error);
       } finally {
@@ -56,7 +58,7 @@ const Input = ({ ValueInput }: ComponentProps) => {
 
     search();
     setFind([]);
-  }, [ValueInput, valueInput]);
+  }, [ valueInput]);
 
   const handleValueInput = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -81,49 +83,58 @@ const Input = ({ ValueInput }: ComponentProps) => {
   };
 
   return (
-    <div className=" flex items-center justify-center ml-2  ">
+    <div className="flex items-center justify-center ml-2">
       <div>
         {loading && (
-          <div className="animate-spin text-blue_base absolute mt-12 ml-64">
+          <div className="animate-spin text-blue_base absolute mt-12 ml-64 lg:ml-[33rem]">
             <FaSpinner />
           </div>
         )}
         <form
           onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()}
         >
-          <input
+          <motion.input
             type="text"
             placeholder="Buscar Local"
             value={valueInput}
             onChange={handleValueInput}
             aria-label="Campo de busca de local"
-            className="mt-9 bg-bg_input border-gray w-72  lg:w-[35rem] h-12 placeholder:p-5 border-2 focus:border-blue_base outline-none rounded-lg"
+            className="mt-9 bg-bg_input border-gray w-72 lg:w-[35rem] h-12 placeholder:p-5 border-2 focus:border-blue_base outline-none rounded-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           />
 
           {find.length > 0 ? (
-            <div className="mt-6 absolute ">
+            <motion.div
+              className="mt-6 absolute"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               {find.map((locale, index) => (
                 <div
                   key={index}
-                  className="flex flex-col z-10 relative bottom-4  left-0"
+                  className="flex flex-col z-10 relative bottom-4 left-0"
                 >
-                  <button
+                  <motion.button
                     onClick={(e) => handleSubmit(locale.name, e)}
-                    className="p-3 bg-gray-800 w-72 lg:w-[35rem] h-12 hover:bg-gray-700  hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
+                    className="p-3 bg-gray-800 w-72 lg:w-[35rem] h-12 hover:bg-gray-700 hover:scale-105 hover:transition ease-linear rounded-lg mb-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <p className="flex items-center justify-center w-72 lg:w-[35rem] -mt-3 -ml-3">
                       {locale.name}, {locale.state ? `${locale.state} ` : ""}
                       {locale.country}
                     </p>
-                  </button>
+                  </motion.button>
                 </div>
               ))}
-            </div>
+            </motion.div>
           ) : null}
         </form>
       </div>
     </div>
   );
 };
-
 export default Input;

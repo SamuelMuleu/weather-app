@@ -8,29 +8,19 @@ import Input from "../../components/Input";
 import WeatherCard from "../../components/WeatherCard";
 import TableStatus from "../../components/TableStatus";
 import WeekWeather from "@/components/WeekWeather";
-
-export interface City {
-  name: string;
-  temp: number;
-  temp_min: number;
-  temp_max: number;
-  feelsLike: number;
-  state: string;
-  dt: number;
-  id: number;
-  weather: string;
-  lat: number;
-  lon: number;
-  timezone: number;
-  timestamp: number;
-}
+import { useDispatch } from "react-redux";
+import { motion } from "framer-motion";
+import { City, setCities } from "@/features/sliceCities";
+import { AppDispatch, RootState } from "@/store";
+import { useSelector } from "react-redux";
 
 const WeatherStatus = () => {
-  const [city, setCity] = useState<City[]>([]);
-
   const [error, setError] = useState<string>("");
 
   const navigate = useNavigate();
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { cities } = useSelector((state: RootState) => state.cities);
 
   const cityName = new URLSearchParams(location.search).get("city");
 
@@ -49,7 +39,7 @@ const WeatherStatus = () => {
           {
             params: {
               q: cityName,
-              appid: "d078f896d3a85db50d3de2fb3705e6ad",
+              appid: import.meta.env.VITE_APP_ID,
               lang: "pt_br",
               date: formattedDate,
               units: "metric",
@@ -75,14 +65,15 @@ const WeatherStatus = () => {
           },
         ];
 
-        setCity(cities);
+        dispatch(setCities(cities));
       } catch (error) {
         console.error(error);
+
         setError("Erro 404: Não foi possível encontrar a cidade!");
       }
     };
     FetchWeather();
-  }, [cityName]);
+  }, [cityName, dispatch]);
 
   const handleSubmitButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -127,63 +118,63 @@ const WeatherStatus = () => {
   };
 
   const getBackgroundImage = (period: string, weather: string) => {
-    if (period === "Manhã" && weather.includes("nublado")) {
+    if (period === "Manhã" && weather.includes("nublado"))
       return backgroundWeather.watherClearMomentDay;
-    } else if (period === "Tarde" && weather.includes("nublado")) {
-      return backgroundWeather.weatherCloudyMomentNight;
-    } else if (period === "Tarde" && weather.includes("céu limpo")) {
-      return backgroundWeather.watherClearMomentDay;
-    } else if (period === "Tarde" && weather.includes("chuva moderada")) {
-      return backgroundWeather.weatherRainMomentDay;
-    } else if (period === "Manhã" && weather.includes("algumas nuvens")) {
+    if (period === "Manhã" && weather.includes("algumas nuvens"))
       return backgroundWeather.weatherCloudMomentDay;
-    } else if (period === "Noite" && weather.includes("nublado")) {
+    if (period === "Tarde" && weather.includes("nublado"))
       return backgroundWeather.weatherCloudyMomentNight;
-    } else if (period === "Noite" && weather.includes("nuvens dispersas")) {
+    if (period === "Tarde" && weather.includes("céu limpo"))
       return backgroundWeather.weatherCloudyMomentNight;
-    } else if (period === "Noite" && weather.includes("chuva forte")) {
+    if (period === "Tarde" && weather.includes("chuva moderada"))
+      return backgroundWeather.weatherRainMomentDay;
+    if (period === "Noite" && weather.includes("nublado"))
+      return backgroundWeather.weatherCloudyMomentNight;
+    if (period === "Noite" && weather.includes("nuvens dispersas"))
+      return backgroundWeather.weatherCloudyMomentNight;
+    if (period === "Noite" && weather.includes("chuva"))
       return backgroundWeather.weatherRainMomentNight;
-    } else if (period === "Noite" && weather.includes("céu limpo")) {
+    if (period === "Noite" && weather.includes("céu limpo"))
       return backgroundWeather.weatherFewCloudsMomentNight;
-    } else if (period === "Noite" && weather.includes("algumas nuvens")) {
+    if (period === "Noite" && weather.includes("algumas nuvens"))
       return backgroundWeather.weatherFewCloudsMomentNight;
-    } else if (period === "Manhã") {
-      return backgroundWeather.weatherFewCloudsMomentDay;
-    } else if (period === "Tarde") {
+    if (period === "Noite" && weather.includes("garoa de leve intensidade"))
+      return backgroundWeather.weatherRainMomentNight;
+    if (period === "Manhã") return backgroundWeather.weatherFewCloudsMomentDay;
+    if (period === "Noite") return backgroundWeather.weatherCloudyMomentNight;
+    if (period === "Tarde")
       return backgroundWeather.weatherFewCloudsMomentNight;
-    } else {
-      return backgroundWeather.watherClearMomentDay;
-    }
+
+    return backgroundWeather.watherClearMomentDay;
   };
 
   const getWeatherIcons = (period: string, weather: string) => {
-    if (period === "Manhã" && weather.includes("nublado")) {
+    if (period === "Manhã" && weather.includes("nublado"))
       return images.cloudyDay;
-    } else if (period === "Tarde" && weather.includes("nublado")) {
+    if (period === "Tarde" && weather.includes("nublado"))
       return images.cloudyDay;
-    } else if (period === "Tarde" && weather.includes("chuva moderada")) {
+    if (period === "Tarde" && weather.includes("chuva moderada"))
       return images.cloudStorm;
-    } else if (period === "Tarde" && weather.includes("céu limpo")) {
-      return images.sun;
-    } else if (period === "Manhã" && weather.includes("algumas nuvens")) {
+    if (period === "Tarde" && weather.includes("céu limpo")) return images.sun;
+    if (period === "Manhã" && weather.includes("algumas nuvens"))
       return images.cloudyDay;
-    } else if (period === "Noite" && weather.includes("nublado")) {
+    if (period === "Noite" && weather.includes("nublado"))
       return images.cloudyNight;
-    } else if (period === "Noite" && weather.includes("nuvens dispersas")) {
+    if (period === "Noite" && weather.includes("nuvens dispersas"))
       return images.fewCloudNight;
-    } else if (period === "Noite" && weather.includes("chuva forte")) {
+    if (period === "Noite" && weather.includes("chuva "))
       return images.cloudStorm;
-    } else if (period === "Noite" && weather.includes("céu limpo")) {
+    if (period === "Noite" && weather.includes("céu limpo"))
       return images.moonNight;
-    } else if (period === "Noite" && weather.includes("algumas nuvens")) {
+    if (period === "Noite" && weather.includes("algumas nuvens"))
       return images.fewCloudNight;
-    } else if (period === "Manhã") {
-      return images.sun;
-    } else if (period === "Tarde") {
-      return images.fewCloudNight;
-    } else {
-      return images.sun;
-    }
+    if (period === "Noite" && weather.includes("garoa de leve intensidade"))
+      return images.cloudyRainNight;
+    if (period === "Manhã") return images.sun;
+    if (period === "Noite") return images.moonNight;
+    if (period === "Tarde") return images.fewCloudNight;
+
+    return images.sun;
   };
 
   return (
@@ -192,16 +183,20 @@ const WeatherStatus = () => {
         <div className="flex gap-1">
           <button
             onClick={handleSubmitButton}
-            className="flex items-center  justify-center mt-8 bg-bg_input p-2 rounded-lg"
+            className="flex items-center justify-center mt-8 bg-bg_input p-2 rounded-lg"
           >
             <img src={cloud} alt="" />
           </button>
-          <Input ValueInput={() => {}} />
+          <Input />
         </div>
 
-        {city.length > 0 ? (
-          <div>
-            {city.map((city) => {
+        {cities.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {cities.map((city) => {
               const { date, time, periods } = formatDate(
                 city.dt,
                 city.timezone
@@ -210,18 +205,22 @@ const WeatherStatus = () => {
               const iconImage = getWeatherIcons(periods, city.weather);
 
               return (
-                <div key={city.id}>
+                <motion.div
+                  key={city.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <WeatherCard
-                    city={city}
                     backgroundImage={backgroundImage}
                     iconImage={iconImage}
                     date={date}
                     time={time}
                   />
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         ) : (
           <div className="font-bold text-2xl flex items-center min-h-screen">
             {error}
@@ -230,19 +229,29 @@ const WeatherStatus = () => {
       </div>
 
       <div className="flex flex-col items-center lg:w-1/2">
-        {city.length > 0 && (
-          <div>
-            {city.map((city) => (
-              <div key={city.id}>
-                <TableStatus lat={city.lat} lon={city.lon} />
-                <WeekWeather city={city} />
-              </div>
+        {cities.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {cities.map((city) => (
+              <motion.div
+              key={city.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5  }}
+              >
+              <TableStatus />
+
+                  <WeekWeather />
+                </motion.div>
+   
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
   );
 };
-
 export default WeatherStatus;
