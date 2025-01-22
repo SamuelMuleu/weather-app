@@ -27,6 +27,7 @@ const WeatherStatus = () => {
   const { images, backgroundWeather } = data;
 
   useEffect(() => {
+    window.scrollTo(0,0);
     if (!cityName) return;
 
     const FetchWeather = async () => {
