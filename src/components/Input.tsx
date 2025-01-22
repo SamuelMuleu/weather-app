@@ -5,19 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-
 const Input = () => {
   const [valueInput, setValueInput] = useState<string>("");
   const [find, setFind] = useState<Location[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-
   const navigate = useNavigate();
 
   useEffect(() => {
     if (valueInput === "") {
-      setValueInput('');
-    
+      setValueInput("");
+
       setFind([]);
       return;
     }
@@ -36,7 +34,6 @@ const Input = () => {
             },
           }
         );
-        
 
         const locations: Location[] = response.data.map((city: Location) => ({
           name: city.name,
@@ -46,9 +43,7 @@ const Input = () => {
           lon: city.lon,
         }));
 
-     
         setFind(locations);
-  
       } catch (error) {
         console.error(error);
       } finally {
@@ -58,7 +53,7 @@ const Input = () => {
 
     search();
     setFind([]);
-  }, [ valueInput]);
+  }, [valueInput]);
 
   const handleValueInput = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -77,7 +72,7 @@ const Input = () => {
     setTimeout(() => {
       setLoading(false);
       setFind([]);
-      setValueInput("")
+      setValueInput("");
       navigate(`/weatherstatus?city=${encodeURIComponent(city)}`);
     }, 1500);
   };
