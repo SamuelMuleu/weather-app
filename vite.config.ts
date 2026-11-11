@@ -7,16 +7,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '/src'),
+      '@': path.resolve(__dirname, 'src'),
     },
-    
-    
   },
   envPrefix: 'VITE_APP_',
-  server: {
-    hmr: true, 
-  },
-    build: {
-    outDir: 'dist',
-  },
 });
