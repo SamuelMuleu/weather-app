@@ -1,67 +1,49 @@
-# Weather App
+# Weather
 
-Este repositório contém um aplicativo para buscar e exibir informações meteorológicas usando React, Redux, TypeScript e Tailwind CSS. O projeto utiliza a API do OpenWeather para obter dados de localização e clima, proporcionando uma interface interativa e funcional.
+Aplicativo de previsão do tempo com busca de cidades, clima atual e previsão para os próximos 5 dias, usando a API do [OpenWeather](https://openweathermap.org/api).
 
----
+🔗 **Demo:** https://myweathercities.netlify.app
 
-## 🌟 **Funcionalidades**
+## Funcionalidades
 
-- Busca de locais com sugestão dinâmica.
-- Exibição de informações meteorológicas detalhadas para o local escolhido.
-- Animações suaves utilizando Framer Motion para melhorar a experiência do usuário.
-- Interface responsiva e estilizada com Tailwind CSS.
+- Busca de cidades com sugestões (debounce, navegação por teclado e cancelamento de requisições antigas)
+- Botão "usar minha localização" (Geolocation API)
+- Clima atual com ícone e fundo de acordo com a condição e com dia/noite no fuso da cidade
+- Detalhes do dia: sensação térmica, chance de chuva, vento (km/h) e umidade
+- Previsão de 5 dias agrupada por dia (mínima, máxima e condição predominante)
+- Estados de carregamento (skeleton) e de erro com opção de tentar novamente
+- Layout responsivo; links compartilháveis (`/weather?lat=..&lon=..&name=..`)
 
----
+## Stack
 
-## 📁 **Estrutura do Projeto**
+React 18 · TypeScript · Redux Toolkit (`createAsyncThunk`) · React Router · Axios · Tailwind CSS · Framer Motion · Vite
 
-```plaintext
-/src
-  /components
-    /
-  /pages
-    /Find
-      /
-    /WeatherStatus
-      /
-  /App.tsx
-  /index.tsx
-  /index.css
-  /tailwind.config.js
-  /postcss.config.cjs
-  /vite.config.ts
-  /package.json
-  /tsconfig.json
-🚀 Como Executar o Projeto
-Clone o repositório:
+## Estrutura
+
 ```
-```bash
-
-git clone: https://github.com/SamuelMuleu/weather-app
-```
-```bash
-Instale as dependências:
-npm install
-```
-Crie um arquivo .env.local na raiz do projeto com sua chave da API do OpenWeather:
-
-```bash
-
-VITE_APP_ID=d078f896d3a85db50d3de2fb3705e6ad
+src/
+  lib/weatherApi.ts     # chamadas à API e normalização dos dados
+  lib/visuals.ts        # código de ícone da API -> ilustração e fundo
+  lib/format.ts         # datas no fuso horário da cidade
+  features/weatherSlice.ts
+  components/           # SearchBox, CurrentWeatherCard, TodayDetails, Forecast, Logo
+  pages/                # Home e Weather
 ```
 
-Execute o projeto:
+## Rodando localmente
 
-```bash
-npm run dev
-```
+1. Crie uma chave gratuita em https://home.openweathermap.org/api_keys
+2. Crie o arquivo `.env.local` na raiz:
 
+   ```bash
+   VITE_APP_ID=sua_chave_aqui
+   ```
 
-## 🔧 Tecnologias Utilizadas
-- React, TypeScript, Redux,Tailwind CSS, Framer Motion,Vite.
+3. Instale e rode:
 
-## 🌐 Detalhes Técnicos
-API Utilizada:
--OpenWeather API, Utilizada para obter informações de geolocalização e clima.
-## 📸 Preview do Projeto
-[![Preview do Projeto](https://i.imgur.com/GAWuRis.png)](https://i.imgur.com/GAWuRis.png)
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+> A chave fica embutida no bundle do front-end (é uma app 100% client-side), então use uma chave do plano gratuito, sem dados de cobrança.

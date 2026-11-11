@@ -1,23 +1,17 @@
-import PageFind from "./pages/Find/page";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
+import Weather from "./pages/Weather";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import WeatherStatus from "./pages/status/page";
-
-function App() {
+export default function App() {
   return (
-
-
-    <Router>
-      <div className="  bg-bg_principal min-h-screen ">
-        <Routes>
-          <Route path="/" element={<PageFind />} />
-          <Route path="/WeatherStatus" element={<WeatherStatus />} />
-        </Routes>
-      </div>
-    </Router>
-          
-
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/weather" element={<Weather />} />
+        {/* Keeps old shared links (/WeatherStatus?city=...) working */}
+        <Route path="/weatherstatus" element={<Weather />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
